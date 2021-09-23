@@ -6,7 +6,7 @@ use Exception;
 
 class BunnyAPIException extends exception
 {
-    public function errorMessage(): string
+    public function errorMessage()
     {//Error message
         return "Error on line {$this->getLine()} in {$this->getFile()}. {$this->getMessage()}.";
     }

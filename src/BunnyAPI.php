@@ -74,7 +74,7 @@ class BunnyAPI
         }
     }
 
-    protected function findStorageZoneAccessKey(string $storage_name): bool
+    protected function findStorageZoneAccessKey(string $storage_name)
     {
         $data = $this->listStorageZones();
         foreach ($data as $zone) {
@@ -86,12 +86,12 @@ class BunnyAPI
         return false;//Never found access key for said storage zone
     }
 
-    protected function constApiKeySet(): bool
+    protected function constApiKeySet()
     {
         return !(!defined("self::API_KEY") || empty(self::API_KEY));
     }
 
-    private function APIcall(string $method, string $url, array $params = [], bool $storage_call = false, bool $video_stream_call = false): array
+    private function APIcall(string $method, string $url, array $params = [], bool $storage_call = false, bool $video_stream_call = false)
     {
         $curl = curl_init();
         if ($method === "POST") {
@@ -137,17 +137,17 @@ class BunnyAPI
         return array('http_code' => $responseCode);
     }
 
-    public function listPullZones(): array
+    public function listPullZones()
     {
         return $this->APIcall('GET', 'pullzone');
     }
 
-    public function getPullZone(int $id): array
+    public function getPullZone(int $id)
     {
         return $this->APIcall('GET', "pullzone/$id");
     }
 
-    public function createPullZone(string $name, string $origin, array $args = array()): array
+    public function createPullZone(string $name, string $origin, array $args = array())
     {
         $args = array_merge(
             array(
@@ -159,27 +159,27 @@ class BunnyAPI
         return $this->APIcall('POST', 'pullzone', $args);
     }
 
-    public function updatePullZone(int $id, array $args = array()): array
+    public function updatePullZone(int $id, array $args = array())
     {
         return $this->APIcall('POST', "pullzone/$id", $args);
     }
 
-    public function pullZoneData(int $id): array
+    public function pullZoneData(int $id)
     {
         return $this->APIcall('GET', "pullzone/$id");
     }
 
-    public function purgePullZone(int $id): array
+    public function purgePullZone(int $id)
     {
         return $this->APIcall('POST', "pullzone/$id/purgeCache");
     }
 
-    public function deletePullZone(int $id): array
+    public function deletePullZone(int $id)
     {
         return $this->APIcall('DELETE', "pullzone/$id");
     }
 
-    public function pullZoneHostnames(int $id): ?array
+    public function pullZoneHostnames(int $id)
     {
         $data = $this->pullZoneData($id);
         if (isset($this->pullZoneData($id)['Hostnames'])) {
@@ -200,27 +200,27 @@ class BunnyAPI
         return array('hostname_count' => 0);
     }
 
-    public function addHostnamePullZone(int $id, string $hostname): array
+    public function addHostnamePullZone(int $id, string $hostname)
     {
         return $this->APIcall('POST', "pullzone/$id/addHostname", array("Hostname" => $hostname));
     }
 
-    public function removeHostnamePullZone(int $id, string $hostname): array
+    public function removeHostnamePullZone(int $id, string $hostname)
     {
         return $this->APIcall('DELETE', "pullzone/$id/removeHostname", array("Hostname" => $hostname));
     }
 
-    public function addFreeSSLCertificate(string $hostname): array
+    public function addFreeSSLCertificate(string $hostname)
     {
         return $this->APIcall('GET', 'pullzone/loadFreeCertificate?hostname=' . $hostname);
     }
 
-    public function forceSSLPullZone(int $id, string $hostname, bool $force_ssl = true): array
+    public function forceSSLPullZone(int $id, string $hostname, bool $force_ssl = true)
     {
         return $this->APIcall('POST', "pullzone/$id/setForceSSL", array("Hostname" => $hostname, 'ForceSSL' => $force_ssl));
     }
 
-    public function listBlockedIpPullZone(int $id): ?array
+    public function listBlockedIpPullZone(int $id)
     {
         $data = $this->pullZoneData($id);
         if (isset($data['BlockedIps'])) {
@@ -237,42 +237,42 @@ class BunnyAPI
         return array('blocked_ip_count' => 0);
     }
 
-    public function resetTokenKey(int $id): array
+    public function resetTokenKey(int $id)
     {
         return $this->APIcall('POST', "pullzone/$id/resetSecurityKey", array());
     }
 
-    public function addBlockedIpPullZone(int $id, string $ip): array
+    public function addBlockedIpPullZone(int $id, string $ip)
     {
         return $this->APIcall('POST', 'pullzone/addBlockedIp', array("PullZoneId" => $id, "BlockedIp" => $ip));
     }
 
-    public function unBlockedIpPullZone(int $id, string $ip): array
+    public function unBlockedIpPullZone(int $id, string $ip)
     {
         return $this->APIcall('POST', 'pullzone/removeBlockedIp', array("PullZoneId" => $id, "BlockedIp" => $ip));
     }
 
-    public function addAllowedReferrer(int $id, string $hostname): array
+    public function addAllowedReferrer(int $id, string $hostname)
     {
         return $this->APIcall('POST', "pullzone/$id/addAllowedReferrer", array("Hostname" => $hostname));
     }
 
-    public function removeAllowedReferrer(int $id, string $hostname): array
+    public function removeAllowedReferrer(int $id, string $hostname)
     {
         return $this->APIcall('POST', "pullzone/$id/removeAllowedReferrer", array("Hostname" => $hostname));
     }
 
-    public function addBlockedReferrer(int $id, string $hostname): array
+    public function addBlockedReferrer(int $id, string $hostname)
     {
         return $this->APIcall('POST', "pullzone/$id/addBlockedReferrer", array("Hostname" => $hostname));
     }
 
-    public function removeBlockedReferrer(int $id, string $hostname): array
+    public function removeBlockedReferrer(int $id, string $hostname)
     {
         return $this->APIcall('POST', "pullzone/$id/removeBlockedReferrer", array("Hostname" => $hostname));
     }
 
-    public function pullZoneLogs(int $id, string $date): array
+    public function pullZoneLogs(int $id, string $date)
     {
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, "https://logging.bunnycdn.com/$date/$id.log");
@@ -308,27 +308,27 @@ class BunnyAPI
         return $line;
     }
 
-    public function listStorageZones(): array
+    public function listStorageZones()
     {
         return $this->APIcall('GET', 'storagezone');
     }
 
-    public function addStorageZone(string $name, string $origin_url, string $main_region = 'DE', array $replicated_regions = []): array
+    public function addStorageZone(string $name, string $origin_url, string $main_region = 'DE', array $replicated_regions = [])
     {
         return $this->APIcall('POST', 'storagezone', array("Name" => $name, "OriginUrl" => $origin_url, "Region" => $main_region, "ReplicationRegions" => $replicated_regions));
     }
 
-    public function deleteStorageZone(int $id): array
+    public function deleteStorageZone(int $id)
     {
         return $this->APIcall('DELETE', "storagezone/$id");
     }
 
-    public function purgeCache(string $url): array
+    public function purgeCache(string $url)
     {
         return $this->APIcall('POST', 'purge', array("url" => $url));
     }
 
-    public function convertBytes(int $bytes, string $convert_to = 'GB', bool $format = true, int $decimals = 2): float|int|string
+    public function convertBytes(int $bytes, string $convert_to = 'GB', bool $format = true, int $decimals = 2)
     {
         if ($convert_to === 'GB') {
             $value = ($bytes / 1073741824);
@@ -345,27 +345,27 @@ class BunnyAPI
         return $value;
     }
 
-    public function getStatistics(): array
+    public function getStatistics()
     {
         return $this->APIcall('GET', 'statistics');
     }
 
-    public function getBilling(): array
+    public function getBilling()
     {
         return $this->APIcall('GET', 'billing');
     }
 
-    public function balance(): array
+    public function balance()
     {
         return $this->getBilling()['Balance'];
     }
 
-    public function monthCharges(): array
+    public function monthCharges()
     {
         return $this->getBilling()['ThisMonthCharges'];
     }
 
-    public function totalBillingAmount(bool $format = false, int $decimals = 2): array
+    public function totalBillingAmount(bool $format = false, int $decimals = 2)
     {
         $data = $this->getBilling();
         $tally = 0;
@@ -378,7 +378,7 @@ class BunnyAPI
         return array('amount' => $tally, 'since' => str_replace('T', ' ', $charge['Timestamp']));
     }
 
-    public function monthChargeBreakdown(): array
+    public function monthChargeBreakdown()
     {
         $ar = $this->getBilling();
         return array('storage' => $ar['MonthlyChargesStorage'], 'EU' => $ar['MonthlyChargesEUTraffic'],
@@ -386,27 +386,27 @@ class BunnyAPI
             'SA' => $ar['MonthlyChargesSATraffic']);
     }
 
-    public function applyCoupon(string $code): array
+    public function applyCoupon(string $code)
     {
         return $this->APIcall('POST', 'applycode', array("couponCode" => $code));
     }
 
-    public function uploadFileHTTP(string $file, string $save_as = 'folder/filename.jpg'): void
+    public function uploadFileHTTP(string $file, string $save_as = 'folder/filename.jpg')
     {
         $this->APIcall('PUT', $this->storage_name . "/" . $save_as, array('file' => $file), true);
     }
 
-    public function deleteFileHTTP(string $file): void
+    public function deleteFileHTTP(string $file)
     {
         $this->APIcall('DELETE', $this->storage_name . "/" . $file, array(), true);
     }
 
-    public function downloadFileHTTP(string $file): void
+    public function downloadFileHTTP(string $file)
     {
         $this->APIcall('GET', $this->storage_name . "/" . $file, array(), true);
     }
 
-    public function createFolder(string $name): array
+    public function createFolder(string $name)
     {
         if (ftp_mkdir($this->connection, $name)) {
             return array('response' => 'success', 'action' => __FUNCTION__, 'value' => $name);
@@ -414,7 +414,7 @@ class BunnyAPI
         return array('response' => 'fail', 'action' => __FUNCTION__, 'value' => $name);
     }
 
-    public function deleteFolder(string $name): array
+    public function deleteFolder(string $name)
     {
         if (ftp_rmdir($this->connection, $name)) {
             return array('response' => 'success', 'action' => __FUNCTION__, 'value' => $name);
@@ -422,7 +422,7 @@ class BunnyAPI
         return array('response' => 'fail', 'action' => __FUNCTION__, 'value' => $name);
     }
 
-    public function deleteFile(string $name): array
+    public function deleteFile(string $name)
     {
         if (ftp_delete($this->connection, $name)) {
             return array('response' => 'success', 'action' => __FUNCTION__, 'value' => $name);
@@ -430,7 +430,7 @@ class BunnyAPI
         return array('response' => 'fail', 'action' => __FUNCTION__, 'value' => $name);
     }
 
-    public function deleteAllFiles(string $dir): array
+    public function deleteAllFiles(string $dir)
     {
         $array = json_decode(file_get_contents(self::STORAGE_API_URL . "/$this->storage_name/{$dir}/?AccessKey=" . $this->access_key), true);
         $files_deleted = 0;
@@ -445,7 +445,7 @@ class BunnyAPI
         return array('action' => __FUNCTION__, 'value' => $dir, 'files_deleted' => $files_deleted);
     }
 
-    public function uploadAllFiles(string $dir, string $place, $mode = FTP_BINARY): array
+    public function uploadAllFiles(string $dir, string $place, $mode = FTP_BINARY)
     {
         $obj = scandir($dir);
         $files_uploaded = 0;
@@ -457,12 +457,12 @@ class BunnyAPI
         return array('action' => __FUNCTION__, 'value' => $dir, 'files_uploaded' => $files_uploaded);
     }
 
-    public function getFileSize(string $file): int
+    public function getFileSize(string $file)
     {
         return ftp_size($this->connection, $file);
     }
 
-    public function dirSize(string $dir = ''): array
+    public function dirSize(string $dir = '')
     {
         $array = json_decode(file_get_contents(self::STORAGE_API_URL . "/$this->storage_name" . $dir . "/?AccessKey=" . $this->access_key), true);
         $size = $files = 0;
@@ -476,12 +476,12 @@ class BunnyAPI
             'size_mb' => number_format(($size / 1048576), 3), 'size_gb' => number_format(($size / 1073741824), 3));
     }
 
-    public function currentDir(): string
+    public function currentDir()
     {
         return ftp_pwd($this->connection);
     }
 
-    public function changeDir(string $moveto): array
+    public function changeDir(string $moveto)
     {
         if (ftp_chdir($this->connection, $moveto)) {
             return array('response' => 'success', 'action' => __FUNCTION__, 'value' => $moveto);
@@ -489,7 +489,7 @@ class BunnyAPI
         return array('response' => 'fail', 'action' => __FUNCTION__, 'value' => $moveto);
     }
 
-    public function moveUpOne(): array
+    public function moveUpOne()
     {
         if (ftp_cdup($this->connection)) {
             return array('response' => 'success', 'action' => __FUNCTION__);
@@ -497,7 +497,7 @@ class BunnyAPI
         return array('response' => 'fail', 'action' => __FUNCTION__);
     }
 
-    public function renameFile(string $dir, string $file_name, string $new_file_name): array
+    public function renameFile(string $dir, string $file_name, string $new_file_name)
     {
         $path_data = pathinfo("{$dir}$file_name");
         $file_type = $path_data['extension'];
@@ -511,7 +511,7 @@ class BunnyAPI
         return array('response' => 'fail', 'action' => __FUNCTION__, 'old' => "{$dir}$file_name", 'new' => "{$dir}$new_file_name");
     }
 
-    public function moveFile(string $dir, string $file_name, string $move_to): array
+    public function moveFile(string $dir, string $file_name, string $move_to)
     {
         $path_data = pathinfo("{$dir}$file_name");
         $file_type = $path_data['extension'];
@@ -525,7 +525,7 @@ class BunnyAPI
         return array('response' => 'fail', 'action' => __FUNCTION__, 'file' => "{$dir}$file_name", 'move_to' => $move_to);
     }
 
-    public function downloadFile(string $save_as, string $get_file, int $mode = FTP_BINARY): array
+    public function downloadFile(string $save_as, string $get_file, int $mode = FTP_BINARY)
     {
         if (ftp_get($this->connection, $save_as, $get_file, $mode)) {
             return array('response' => 'success', 'action' => __FUNCTION__, 'file' => $get_file, 'save_as' => $save_as);
@@ -533,7 +533,7 @@ class BunnyAPI
         return array('response' => 'fail', 'action' => __FUNCTION__, 'file' => $get_file, 'save_as' => $save_as);
     }
 
-    public function downloadFileWithProgress(string $save_as, string $get_file, string $progress_file = 'DOWNLOAD_PERCENT.txt'): void
+    public function downloadFileWithProgress(string $save_as, string $get_file, string $progress_file = 'DOWNLOAD_PERCENT.txt')
     {
         $ftp_url = "ftp://$this->storage_name:$this->access_key@" . self::HOSTNAME . "/$this->storage_name/$get_file";
         $size = filesize($ftp_url);
@@ -549,7 +549,7 @@ class BunnyAPI
         fclose($in);
     }
 
-    public function downloadAll(string $dir_dl_from = '', string $dl_into = '', int $mode = FTP_BINARY): array
+    public function downloadAll(string $dir_dl_from = '', string $dl_into = '', int $mode = FTP_BINARY)
     {
         $array = json_decode(file_get_contents(self::STORAGE_API_URL . "/$this->storage_name" . $dir_dl_from . "/?AccessKey=" . $this->access_key), true);
         $files_downloaded = 0;
@@ -564,7 +564,7 @@ class BunnyAPI
         return array('action' => __FUNCTION__, 'files_downloaded' => $files_downloaded);
     }
 
-    public function uploadFile(string $upload, string $upload_as, int $mode = FTP_BINARY): array
+    public function uploadFile(string $upload, string $upload_as, int $mode = FTP_BINARY)
     {
         if (ftp_put($this->connection, $upload_as, $upload, $mode)) {
             return array('response' => 'success', 'action' => __FUNCTION__, 'file' => $upload, 'upload_as' => $upload_as);
@@ -572,7 +572,7 @@ class BunnyAPI
         return array('response' => 'fail', 'action' => __FUNCTION__, 'file' => $upload, 'upload_as' => $upload_as);
     }
 
-    public function uploadFileWithProgress(string $upload, string $upload_as, string $progress_file = 'UPLOAD_PERCENT.txt'): void
+    public function uploadFileWithProgress(string $upload, string $upload_as, string $progress_file = 'UPLOAD_PERCENT.txt')
     {
         $ftp_url = "ftp://$this->storage_name:$this->access_key@" . self::HOSTNAME . "/$this->storage_name/$upload_as";
         $size = filesize($upload);
@@ -588,7 +588,7 @@ class BunnyAPI
         fclose($out);
     }
 
-    public function boolToInt(bool $bool): int
+    public function boolToInt(bool $bool)
     {
         if ($bool) {
             return 1;
@@ -596,17 +596,17 @@ class BunnyAPI
         return 0;
     }
 
-    public function jsonHeader(): void
+    public function jsonHeader()
     {
         header('Content-Type: application/json');
     }
 
-    public function listAllOG(): array
+    public function listAllOG()
     {
         return json_decode(file_get_contents(self::STORAGE_API_URL . "/$this->storage_name/?AccessKey=" . $this->access_key), true);
     }
 
-    public function listFiles(string $location = ''): array
+    public function listFiles(string $location = '')
     {
         $array = json_decode(file_get_contents(self::STORAGE_API_URL . "/$this->storage_name" . $location . "/?AccessKey=" . $this->access_key), true);
         $items = array('storage_name' => $this->storage_name, 'current_dir' => $location, 'data' => array());
@@ -629,7 +629,7 @@ class BunnyAPI
         return $items;
     }
 
-    public function listFolders(string $location = ''): array
+    public function listFolders(string $location = '')
     {
         $array = json_decode(file_get_contents(self::STORAGE_API_URL . "/$this->storage_name" . $location . "/?AccessKey=$this->access_key"), true);
         $items = array('storage_name' => $this->storage_name, 'current_dir' => $location, 'data' => array());
@@ -646,7 +646,7 @@ class BunnyAPI
         return $items;
     }
 
-    public function listAll(string $location = ''): array
+    public function listAll(string $location = '')
     {
         $array = json_decode(file_get_contents(self::STORAGE_API_URL . "/$this->storage_name" . $location . "/?AccessKey=" . $this->access_key), true);
         $items = array('storage_name' => $this->storage_name, 'current_dir' => $location, 'data' => array());
@@ -672,7 +672,7 @@ class BunnyAPI
         return $items;
     }
 
-    public function closeConnection(): array
+    public function closeConnection()
     {
         if (ftp_close($this->connection)) {
             return array('response' => 'success', 'action' => __FUNCTION__);
@@ -680,7 +680,7 @@ class BunnyAPI
         return array('response' => 'fail', 'action' => __FUNCTION__);
     }
 
-    public function costCalculator(int $bytes): array
+    public function costCalculator(int $bytes)
     {
         $zone1 = 0.01;
         $zone2 = 0.03;
@@ -712,27 +712,27 @@ class BunnyAPI
      *
     */
     //Library -> collection -> video
-    public function setStreamLibraryId(int $library_id): void
+    public function setStreamLibraryId(int $library_id)
     {
         $this->stream_library_id = $library_id;
     }
 
-    public function setStreamCollectionGuid(string $collection_guid): void
+    public function setStreamCollectionGuid(string $collection_guid)
     {
         $this->stream_collection_guid = $collection_guid;
     }
 
-    public function setStreamVideoGuid(string $video_guid): void
+    public function setStreamVideoGuid(string $video_guid)
     {
         $this->stream_video_guid = $video_guid;
     }
 
-    public function getVideoCollections(): array
+    public function getVideoCollections()
     {
         return $this->APIcall('GET', "library/{$this->stream_library_id}/collections", [], false, true);
     }
 
-    public function getStreamCollections(int $library_id = 0, int $page = 1, int $items_pp = 100, string $order_by = 'date'): array
+    public function getStreamCollections(int $library_id = 0, int $page = 1, int $items_pp = 100, string $order_by = 'date')
     {
         if ($library_id === 0) {
             $library_id = $this->stream_library_id;
@@ -740,7 +740,7 @@ class BunnyAPI
         return $this->APIcall('GET', "library/$library_id/collections?page=$page&itemsPerPage=$items_pp&orderBy=$order_by", [], false, true);
     }
 
-    public function getStreamForCollection(int $library_id = 0, string $collection_guid = ''): array
+    public function getStreamForCollection(int $library_id = 0, string $collection_guid = '')
     {
         if ($library_id === 0) {
             $library_id = $this->stream_library_id;
@@ -751,22 +751,22 @@ class BunnyAPI
         return $this->APIcall('GET', "library/$library_id/collections/$collection_guid", [], false, true);
     }
 
-    public function updateCollection(int $library_id, string $collection_guid, string $video_library_id, int $video_count, int $total_size): array
+    public function updateCollection(int $library_id, string $collection_guid, string $video_library_id, int $video_count, int $total_size)
     {
         return $this->APIcall('POST', "library/$library_id/collections/$collection_guid", array("videoLibraryId" => $video_library_id, "videoCount" => $video_count, "totalSize" => $total_size), false, true);
     }
 
-    public function deleteCollection(int $library_id, string $collection_id): array
+    public function deleteCollection(int $library_id, string $collection_id)
     {
         return $this->APIcall('DELETE', "library/$library_id/collections/$collection_id", [], false, true);
     }
 
-    public function createCollection(int $library_id, string $video_library_id, int $video_count, int $total_size): array
+    public function createCollection(int $library_id, string $video_library_id, int $video_count, int $total_size)
     {
         return $this->APIcall('POST', "library/$library_id/collections", array("videoLibraryId" => $video_library_id, "videoCount" => $video_count, "totalSize" => $total_size), false, true);
     }
 
-    public function listVideos(int $page = 1, int $items_pp = 100, string $order_by = 'date'): array
+    public function listVideos(int $page = 1, int $items_pp = 100, string $order_by = 'date')
     {
         if (!isset($this->stream_library_id)) {
             return array('response' => 'fail', 'action' => __FUNCTION__, 'message' => 'You must set library id with: setStreamLibraryId()');
@@ -774,17 +774,17 @@ class BunnyAPI
         return $this->APIcall('GET', "library/{$this->stream_library_id}/videos?page=$page&itemsPerPage=$items_pp&orderBy=$order_by", [], false, true);
     }
 
-    public function getVideo(int $library_id, string $video_guid): array
+    public function getVideo(int $library_id, string $video_guid)
     {
         return $this->APIcall('GET', "library/$library_id/videos/$video_guid", [], false, true);
     }
 
-    public function deleteVideo(int $library_id, string $video_guid): array
+    public function deleteVideo(int $library_id, string $video_guid)
     {
         return $this->APIcall('DELETE', "library/$library_id/videos/$video_guid", [], false, true);
     }
 
-    public function createVideo(int $library_id, string $video_title, string $collection_guid = ''): array
+    public function createVideo(int $library_id, string $video_title, string $collection_guid = '')
     {
         if (!empty($collection_guid)) {
             return $this->APIcall('POST', "library/$library_id/videos?title=$video_title&collectionId=$collection_guid", [], false, true);
@@ -792,23 +792,23 @@ class BunnyAPI
         return $this->APIcall('POST', "library/$library_id/videos?title=$video_title", [], false, true);
     }
 
-    public function uploadVideo(int $library_id, string $video_guid, string $video_to_upload): array
+    public function uploadVideo(int $library_id, string $video_guid, string $video_to_upload)
     {
         //Need to use createVideo() first to get video guid
         return $this->APIcall('PUT', "library/$library_id/videos/$video_guid", array('file' => $video_to_upload), false, true);
     }
 
-    public function setThumbnail(int $library_id, string $video_guid, string $thumbnail_url): array
+    public function setThumbnail(int $library_id, string $video_guid, string $thumbnail_url)
     {
         return $this->APIcall('POST', "library/$library_id/videos/$video_guid/thumbnail?$thumbnail_url", [], false, true);
     }
 
-    public function addCaptions(int $library_id, string $video_guid, string $srclang, string $label, string $captions_file): array
+    public function addCaptions(int $library_id, string $video_guid, string $srclang, string $label, string $captions_file)
     {
         return $this->APIcall('POST', "library/$library_id/videos/$video_guid/captions/$srclang?label=$label&captionsFile=$captions_file", [], false, true);
     }
 
-    public function deleteCaptions(int $library_id, string $video_guid, string $srclang): array
+    public function deleteCaptions(int $library_id, string $video_guid, string $srclang)
     {
         return $this->APIcall('DELETE', "library/$library_id/videos/$video_guid/captions/$srclang", [], false, true);
     }
