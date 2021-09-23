@@ -11,12 +11,12 @@ use Corbpie\BunnyCdn\BunnyAPIException;
  */
 class BunnyAPI
 {
-    private const API_KEY = 'XXXX-XXXX-XXXX';//BunnyCDN API key
-    private const API_URL = 'https://bunnycdn.com/api/';//URL for BunnyCDN API
-    private const STORAGE_API_URL = 'https://storage.bunnycdn.com/';//URL for storage zone replication region (LA|NY|SG|SYD) Falkenstein is as default
-    private const VIDEO_STREAM_URL = 'http://video.bunnycdn.com/';//URL for Bunny video stream API
-    private const HOSTNAME = 'storage.bunnycdn.com';//FTP hostname
-    private const STREAM_LIBRARY_ACCESS_KEY = 'XXXX-XXXX-XXXX';
+    const API_KEY = 'XXXX-XXXX-XXXX';//BunnyCDN API key
+    const API_URL = 'https://bunnycdn.com/api/';//URL for BunnyCDN API
+    const STORAGE_API_URL = 'https://storage.bunnycdn.com/';//URL for storage zone replication region (LA|NY|SG|SYD) Falkenstein is as default
+    const VIDEO_STREAM_URL = 'http://video.bunnycdn.com/';//URL for Bunny video stream API
+    const HOSTNAME = 'storage.bunnycdn.com';//FTP hostname
+    const STREAM_LIBRARY_ACCESS_KEY = 'XXXX-XXXX-XXXX';
     private $api_key;
     private $access_key;
     private $storage_name;
@@ -32,7 +32,7 @@ class BunnyAPI
             if (!$this->constApiKeySet()) {
                 throw new BunnyAPIException("You must provide an API key");
             } else {
-                $this->api_key = self::API_KEY;
+                $this->api_key = BunnyAPI::API_KEY;
             }
         } catch (BunnyAPIException $e) {//display error message
             echo $e->errorMessage();
@@ -60,12 +60,12 @@ class BunnyAPI
     {
         $this->storage_name = $storage_name;
         (empty($access_key)) ? $this->findStorageZoneAccessKey($storage_name) : $this->access_key = $access_key;
-        $conn_id = ftp_connect((self::HOSTNAME));
+        $conn_id = ftp_connect((BunnyAPI::HOSTNAME));
         $login = ftp_login($conn_id, $storage_name, $this->access_key);
         ftp_pasv($conn_id, true);
         try {
             if (!$conn_id) {
-                throw new BunnyAPIException("Could not make FTP connection to " . (self::HOSTNAME) . "");
+                throw new BunnyAPIException("Could not make FTP connection to " . (BunnyAPI::HOSTNAME) . "");
             } else {
                 $this->connection = $conn_id;
             }
@@ -117,13 +117,13 @@ class BunnyAPI
             }
         }
         if (!$storage_call && !$video_stream_call) {//General CDN pullzone
-            curl_setopt($curl, CURLOPT_URL, self::API_URL . (string)$url);
+            curl_setopt($curl, CURLOPT_URL, BunnyAPI::API_URL . (string)$url);
             curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-Type: application/json", "AccessKey: $this->api_key"));
         } elseif ($video_stream_call) {//Video stream
-            curl_setopt($curl, CURLOPT_URL, self::VIDEO_STREAM_URL . (string)$url);
-            curl_setopt($curl, CURLOPT_HTTPHEADER, array("AccessKey: " . self::STREAM_LIBRARY_ACCESS_KEY . ""));
+            curl_setopt($curl, CURLOPT_URL, BunnyAPI::VIDEO_STREAM_URL . (string)$url);
+            curl_setopt($curl, CURLOPT_HTTPHEADER, array("AccessKey: " . BunnyAPI::STREAM_LIBRARY_ACCESS_KEY . ""));
         } else {//Storage zone
-            curl_setopt($curl, CURLOPT_URL, self::STORAGE_API_URL . (string)$url);
+            curl_setopt($curl, CURLOPT_URL, BunnyAPI::STORAGE_API_URL . (string)$url);
             curl_setopt($curl, CURLOPT_HTTPHEADER, array("AccessKey: $this->access_key"));
         }
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
@@ -432,7 +432,7 @@ class BunnyAPI
 
     public function deleteAllFiles(string $dir)
     {
-        $array = json_decode(file_get_contents(self::STORAGE_API_URL . "/$this->storage_name/{$dir}/?AccessKey=" . $this->access_key), true);
+        $array = json_decode(file_get_contents(BunnyAPI::STORAGE_API_URL . "/$this->storage_name/{$dir}/?AccessKey=" . $this->access_key), true);
         $files_deleted = 0;
         foreach ($array as $value) {
             if ($value['IsDirectory'] === false) {
@@ -464,7 +464,7 @@ class BunnyAPI
 
     public function dirSize(string $dir = '')
     {
-        $array = json_decode(file_get_contents(self::STORAGE_API_URL . "/$this->storage_name" . $dir . "/?AccessKey=" . $this->access_key), true);
+        $array = json_decode(file_get_contents(BunnyAPI::STORAGE_API_URL . "/$this->storage_name" . $dir . "/?AccessKey=" . $this->access_key), true);
         $size = $files = 0;
         foreach ($array as $value) {
             if ($value['IsDirectory'] === false) {
@@ -535,7 +535,7 @@ class BunnyAPI
 
     public function downloadFileWithProgress(string $save_as, string $get_file, string $progress_file = 'DOWNLOAD_PERCENT.txt')
     {
-        $ftp_url = "ftp://$this->storage_name:$this->access_key@" . self::HOSTNAME . "/$this->storage_name/$get_file";
+        $ftp_url = "ftp://$this->storage_name:$this->access_key@" . BunnyAPI::HOSTNAME . "/$this->storage_name/$get_file";
         $size = filesize($ftp_url);
         $in = fopen($ftp_url, "rb") or die("Cannot open source file");
         $out = fopen($save_as, "wb");
@@ -551,7 +551,7 @@ class BunnyAPI
 
     public function downloadAll(string $dir_dl_from = '', string $dl_into = '', int $mode = FTP_BINARY)
     {
-        $array = json_decode(file_get_contents(self::STORAGE_API_URL . "/$this->storage_name" . $dir_dl_from . "/?AccessKey=" . $this->access_key), true);
+        $array = json_decode(file_get_contents(BunnyAPI::STORAGE_API_URL . "/$this->storage_name" . $dir_dl_from . "/?AccessKey=" . $this->access_key), true);
         $files_downloaded = 0;
         foreach ($array as $value) {
             if ($value['IsDirectory'] === false) {
@@ -574,7 +574,7 @@ class BunnyAPI
 
     public function uploadFileWithProgress(string $upload, string $upload_as, string $progress_file = 'UPLOAD_PERCENT.txt')
     {
-        $ftp_url = "ftp://$this->storage_name:$this->access_key@" . self::HOSTNAME . "/$this->storage_name/$upload_as";
+        $ftp_url = "ftp://$this->storage_name:$this->access_key@" . BunnyAPI::HOSTNAME . "/$this->storage_name/$upload_as";
         $size = filesize($upload);
         $out = fopen($ftp_url, "wb");
         $in = fopen($upload, "rb");
@@ -603,12 +603,12 @@ class BunnyAPI
 
     public function listAllOG()
     {
-        return json_decode(file_get_contents(self::STORAGE_API_URL . "/$this->storage_name/?AccessKey=" . $this->access_key), true);
+        return json_decode(file_get_contents(BunnyAPI::STORAGE_API_URL . "/$this->storage_name/?AccessKey=" . $this->access_key), true);
     }
 
     public function listFiles(string $location = '')
     {
-        $array = json_decode(file_get_contents(self::STORAGE_API_URL . "/$this->storage_name" . $location . "/?AccessKey=" . $this->access_key), true);
+        $array = json_decode(file_get_contents(BunnyAPI::STORAGE_API_URL . "/$this->storage_name" . $location . "/?AccessKey=" . $this->access_key), true);
         $items = array('storage_name' => $this->storage_name, 'current_dir' => $location, 'data' => array());
         foreach ($array as $value) {
             if ($value['IsDirectory'] === false) {
@@ -631,7 +631,7 @@ class BunnyAPI
 
     public function listFolders(string $location = '')
     {
-        $array = json_decode(file_get_contents(self::STORAGE_API_URL . "/$this->storage_name" . $location . "/?AccessKey=$this->access_key"), true);
+        $array = json_decode(file_get_contents(BunnyAPI::STORAGE_API_URL . "/$this->storage_name" . $location . "/?AccessKey=$this->access_key"), true);
         $items = array('storage_name' => $this->storage_name, 'current_dir' => $location, 'data' => array());
         foreach ($array as $value) {
             $created = date('Y-m-d H:i:s', strtotime($value['DateCreated']));
@@ -648,7 +648,7 @@ class BunnyAPI
 
     public function listAll(string $location = '')
     {
-        $array = json_decode(file_get_contents(self::STORAGE_API_URL . "/$this->storage_name" . $location . "/?AccessKey=" . $this->access_key), true);
+        $array = json_decode(file_get_contents(BunnyAPI::STORAGE_API_URL . "/$this->storage_name" . $location . "/?AccessKey=" . $this->access_key), true);
         $items = array('storage_name' => $this->storage_name, 'current_dir' => $location, 'data' => array());
         foreach ($array as $value) {
             $created = date('Y-m-d H:i:s', strtotime($value['DateCreated']));
