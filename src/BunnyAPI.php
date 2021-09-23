@@ -17,16 +17,16 @@ class BunnyAPI
     private const VIDEO_STREAM_URL = 'http://video.bunnycdn.com/';//URL for Bunny video stream API
     private const HOSTNAME = 'storage.bunnycdn.com';//FTP hostname
     private const STREAM_LIBRARY_ACCESS_KEY = 'XXXX-XXXX-XXXX';
-    private string $api_key;
-    private string $access_key;
-    private string $storage_name;
+    private $api_key;
+    private $access_key;
+    private $storage_name;
     private $connection;
-    private array $data;
-    private int $stream_library_id;
-    private string $stream_collection_guid = '';
-    private string $stream_video_guid = '';
+    private $data;
+    private $stream_library_id;
+    private $stream_collection_guid = '';
+    private $stream_video_guid = '';
 
-    public function __construct(int $execution_time = 240, bool $json_header = false)
+    public function __construct($execution_time = 240, $json_header = false)
     {
         try {
             if (!$this->constApiKeySet()) {
@@ -43,7 +43,7 @@ class BunnyAPI
         }
     }
 
-    public function apiKey(string $api_key = '')
+    public function apiKey($api_key = '')
     {
         try {
             if (!isset($api_key) || trim($api_key) === '') {
@@ -56,7 +56,7 @@ class BunnyAPI
         }
     }
 
-    public function zoneConnect(string $storage_name, string $access_key = '')
+    public function zoneConnect($storage_name, $access_key = '')
     {
         $this->storage_name = $storage_name;
         (empty($access_key)) ? $this->findStorageZoneAccessKey($storage_name) : $this->access_key = $access_key;
@@ -91,7 +91,7 @@ class BunnyAPI
         return !(!defined("self::API_KEY") || empty(self::API_KEY));
     }
 
-    private function APIcall(string $method, string $url, array $params = [], bool $storage_call = false, bool $video_stream_call = false)
+    private function APIcall($method, $url, $params = [], $storage_call = false, $video_stream_call = false)
     {
         $curl = curl_init();
         if ($method === "POST") {
