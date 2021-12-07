@@ -1,5 +1,5 @@
 {
-  "name": "corbpie/bunny-cdn-api",
+  "name": "pirux2/bunny-cdn-api-fixed",
   "description": "Bunny CDN API class for handling pull and storage zones plus video streaming.",
   "type": "library",
   "license": "MIT",
