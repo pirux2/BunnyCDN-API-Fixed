@@ -572,7 +572,7 @@ class BunnyAPI
         return array('response' => 'fail', 'action' => __FUNCTION__, 'file' => $upload, 'upload_as' => $upload_as);
     }
 
-    public function uploadFileWithProgress(string $upload, string $upload_as, string $progress_file = 'UPLOAD_PERCENT.txt')
+    public function uploadFileWithProgress(string $upload, string $upload_as, $progress_callback)
     {
         $ftp_url = "ftp://$this->storage_name:$this->access_key@" . BunnyAPI::HOSTNAME . "/$this->storage_name/$upload_as";
         $size = filesize($upload);
@@ -582,7 +582,9 @@ class BunnyAPI
             $buffer = fread($in, 10240);
             fwrite($out, $buffer);
             $file_data = (int)(ftell($in) / $size * 100);
-            file_put_contents($progress_file, $file_data);
+            if ( $progress_callback ) { 
+                $progress_callback($file_data);
+            }
         }
         fclose($in);
         fclose($out);
